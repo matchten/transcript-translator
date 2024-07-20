@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YouTube Video Summarizer</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/main.css') }}"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-2xl">
+      <h1 class="text-2xl font-bold mb-6 text-center text-gray-800">
+        YouTube Video Summarizer
+      </h1>
+      <form id="youtube-form" class="flex flex-col items-center">
+        <input
+          type="text"
+          name="youtube_url"
+          placeholder="Enter YouTube URL"
+          required
+          class="w-2/3 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+        />
+        <button
+          type="submit"
+          class="w-2/3 bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300 mb-4"
+        >
+          Summarize
+        </button>
+      </form>
+
+      <!-- Summary box (hidden by default) -->
+      <div
+        id="summary-box"
+        class="hidden mt-6 border border-gray-300 rounded-md p-4 bg-gray-50"
+      >
+        <h3 class="text-lg font-semibold mb-2 text-gray-800">Summary</h3>
+        <div id="summary-content" class="text-sm text-gray-600"></div>
+      </div>
+
+      <script>
+        document
+          .getElementById("youtube-form")
+          .addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+
+            fetch("/summarize", {
+              method: "POST",
+              body: formData,
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                if (data.error) {
+                  alert(data.error);
+                } else {
+                  document.getElementById("summary-content").innerHTML =
+                    data.summary;
+                  document
+                    .getElementById("summary-box")
+                    .classList.remove("hidden");
+                }
+              })
+              .catch((error) => {
+                console.error("Error:", error);
+                alert("An error occurred. Please try again.");
+              });
+          });
+      </script>
+    </div>
+  </body>
+</html>

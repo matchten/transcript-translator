@@ -92,25 +92,26 @@ def transcribe_audio(audio_data, sample_rate):
         print(f"Error transcribing audio: {e}")
         return None
 
-# Input YouTube URL
-youtube_url = input("Enter the YouTube URL: ")
-
-# Download and load audio from YouTube
-print("Downloading audio...")
-audio_file_path = download_youtube_audio(youtube_url)
-if audio_file_path:
-    print("Audio downloaded. Loading file...")
-    audio_data, sample_rate = load_audio_file(audio_file_path)
-    if audio_data is not None:
-        print(f"Audio loaded. Duration: {len(audio_data) / sample_rate:.2f} seconds")
-        transcription = transcribe_audio(audio_data, sample_rate)
-        if transcription:
-            print("Transcription complete:")
-            print(transcription)
-        
-        # Clean up the temporary audio file
-        os.remove(audio_file_path)
+def get_transcription(youtube_url):
+    # Download and load audio from YouTube
+    print("Downloading audio...")
+    audio_file_path = download_youtube_audio(youtube_url)
+    if audio_file_path:
+        print("Audio downloaded. Loading file...")
+        audio_data, sample_rate = load_audio_file(audio_file_path)
+        if audio_data is not None:
+            print(f"Audio loaded. Duration: {len(audio_data) / sample_rate:.2f} seconds")
+            transcription = transcribe_audio(audio_data, sample_rate)
+            if transcription:
+                print("Transcription complete:")
+                print(transcription)
+                return transcription
+            
+            # Clean up the temporary audio file
+            os.remove(audio_file_path)
+        else:
+            print("Failed to load audio file.")
     else:
-        print("Failed to load audio file.")
-else:
-    print("Failed to download audio.")
+        print("Failed to download audio.")
+    
+    return None

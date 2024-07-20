@@ -1,0 +1,24 @@
+{
+  "name": "transcript-translator",
+  "version": "1.0.0",
+  "description": "Install with python=3.9 numpy=1.23.1 might have to install cuda version of torch and pyannote.audio",
+  "main": "index.js",
+  "scripts": {
+    "build-css": "tailwindcss build static/src/main.css -o static/css/main.css"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.39",
+    "tailwindcss": "^3.4.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  },
+  "scripts": {
+    "build-css": "tailwindcss build static/src/main.css -o static/css/main.css",
+    "watch-css": "nodemon --watch templates --watch static/src -e html,js,css --exec npm run build-css"
+  }
+}
