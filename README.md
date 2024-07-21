@@ -7,8 +7,8 @@ transcribe and summarize the video.
 Built using whisper and LLama3. MIT License.
 
 <div style="display: flex; justify-content: space-between;">
-    <img src="images/home.png" alt="screenshot" style="width: 50%;">
-    <img src="images/output.png" alt="screenshot" style="width: 50%;">
+    <img src="demo_images/home.png" alt="screenshot" style="width: 50%;">
+    <img src="demo_images/output.png" alt="screenshot" style="width: 50%;">
 </div>
 
 ## Setup
