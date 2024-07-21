@@ -20,5 +20,6 @@ static/css/main.css
 .DS_Store
 Thumbs.db
 
-# Downloaded videos
+# Downloaded videos/images
 *.wav
+images/
