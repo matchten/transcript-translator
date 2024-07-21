@@ -9,6 +9,11 @@
       href="{{ url_for('static', filename='css/main.css') }}"
     />
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .preserve-whitespace {
+        white-space: pre-wrap;
+      }
+    </style>
   </head>
   <body class="bg-gray-100 min-h-screen flex items-center justify-center">
     <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-2xl">
@@ -40,33 +45,131 @@
         <div id="summary-content" class="text-sm text-gray-600"></div>
       </div>
 
+      <!-- Add this loading bar inside the main div -->
+      <div id="loading-bar" class="hidden mt-4 w-full bg-gray-200 rounded-md">
+        <div
+          id="loading-progress"
+          class="bg-blue-500 h-2 rounded-md transition-all duration-300 ease-out"
+          style="width: 0%"
+        ></div>
+      </div>
+
       <script>
         document
           .getElementById("youtube-form")
           .addEventListener("submit", function (e) {
             e.preventDefault();
 
+            // Remove previous summary box if it exists
+            const summaryBox = document.getElementById("summary-box");
+            if (!summaryBox.classList.contains("hidden")) {
+              summaryBox.classList.add("hidden");
+              document.getElementById("summary-content").innerHTML = "";
+            }
+
             const formData = new FormData(this);
+            const loadingBar = document.getElementById("loading-bar");
+            const loadingProgress = document.getElementById("loading-progress");
+            const submitButton = this.querySelector('button[type="submit"]');
+
+            // Change button appearance
+            submitButton.classList.remove(
+              "bg-blue-500",
+              "text-white",
+              "hover:bg-blue-600"
+            );
+            submitButton.classList.add(
+              "bg-gray-300",
+              "text-black",
+              "cursor-not-allowed"
+            );
+            submitButton.disabled = true;
+
+            loadingBar.classList.remove("hidden");
+            loadingProgress.style.width = "0%"; // Reset progress
+
+            // Update progress bar animation
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+              progress += 0.1; // Smaller increment for smoother animation
+              if (progress > 100) {
+                progress = 100;
+                clearInterval(progressInterval);
+              }
+              loadingProgress.style.width = `${progress}%`;
+            }, 100); // Update more frequently
 
             fetch("/summarize", {
               method: "POST",
               body: formData,
             })
-              .then((response) => response.json())
-              .then((data) => {
-                if (data.error) {
-                  alert(data.error);
-                } else {
-                  document.getElementById("summary-content").innerHTML =
-                    data.summary;
-                  document
-                    .getElementById("summary-box")
-                    .classList.remove("hidden");
-                }
+              .then((response) => {
+                const reader = response.body.getReader();
+                return new ReadableStream({
+                  start(controller) {
+                    function push() {
+                      reader.read().then(({ done, value }) => {
+                        if (done) {
+                          controller.close();
+                          clearInterval(progressInterval); // Clear interval when done
+                          loadingProgress.style.width = "100%"; // Ensure progress bar is full
+                          // Revert button appearance
+                          submitButton.classList.remove(
+                            "bg-gray-500",
+                            "text-black",
+                            "cursor-not-allowed"
+                          );
+                          submitButton.classList.add(
+                            "bg-blue-500",
+                            "text-white",
+                            "hover:bg-blue-600"
+                          );
+                          submitButton.disabled = false;
+                          return;
+                        }
+                        controller.enqueue(value);
+                        const chunk = new TextDecoder().decode(value);
+                        const data = JSON.parse(chunk);
+                        if (data.summary) {
+                          loadingBar.classList.add("hidden");
+                          const summaryContent =
+                            document.getElementById("summary-content");
+                          summaryContent.innerHTML = data.summary.replace(
+                            /\n/g,
+                            "<br>"
+                          );
+                          summaryContent.classList.add("preserve-whitespace");
+                          document
+                            .getElementById("summary-box")
+                            .classList.remove("hidden");
+                        } else if (data.error) {
+                          loadingBar.classList.add("hidden");
+                          alert(data.error);
+                        }
+                        push();
+                      });
+                    }
+                    push();
+                  },
+                });
               })
               .catch((error) => {
+                clearInterval(progressInterval); // Clear interval on error
+                loadingBar.classList.add("hidden");
                 console.error("Error:", error);
                 alert("An error occurred. Please try again.");
+                // Revert button appearance on error
+                submitButton.classList.remove(
+                  "bg-gray-300",
+                  "text-black",
+                  "cursor-not-allowed"
+                );
+                submitButton.classList.add(
+                  "bg-blue-500",
+                  "text-white",
+                  "hover:bg-blue-600"
+                );
+                submitButton.disabled = false;
               });
           });
       </script>
