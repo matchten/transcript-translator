@@ -2,13 +2,11 @@
 
 Use ScribeGPT to summarize any YouTube video. Whether it be
 a lecture video, news report, or podcast, ScribeGPT will provide
-transcribe and summarize the video.
-
-Built using whisper and LLama3. MIT License.
+transcribe and summarize the video. Built using whisper and LLama3. MIT License.
 
 <div style="display: flex; justify-content: space-between;">
-    <img src="demo_images/home.png" alt="screenshot" style="width: 50%;">
-    <img src="demo_images/output.png" alt="screenshot" style="width: 50%;">
+    <img src="demo_images/home.png" alt="screenshot" style="width: 49%;">
+    <img src="demo_images/output.png" alt="screenshot" style="width: 49%;">
 </div>
 
 ## Setup
